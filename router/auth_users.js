@@ -40,7 +40,7 @@ regd_users.post("/", (req, res) => {
         "access",
         { expiresIn: 60 * 60 }
       );
-      res.send(accessToken);
+        res.send(accessToken);
         req.session.accessToken = accessToken;
     }
   } else {
