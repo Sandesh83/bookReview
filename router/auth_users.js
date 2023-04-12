@@ -40,8 +40,10 @@ regd_users.post("/", (req, res) => {
         "access",
         { expiresIn: 60 * 60 }
       );
+      req.session.accessToken = accessToken;
+      req.session.username = username;
       res.status(201).send(accessToken);
-      // req.session.accessToken = accessToken;
+      console.log(req.session.accessToken);
     }
   } else {
     return res
@@ -55,20 +57,27 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
   const isbn = req.params.isbn;
   const review = req.body.review;
-  const rating = req.body.rating;
-  const username = req.body.username;
+  const username = req.session.username;
   try {
-    if (isbn && review && rating && username) {
+    if (isbn && review  && username) {
       if (isValid(username)) {
         const book = books[isbn];
+        for (const book of Object.values(books)) {
+          for (const bookReview of book.reviews) {
+            if (bookReview.username === username) {
+              bookReview.review = review;
+              return res.status(200).json({ message : "Review updated sucessfully", review: review}); // review updated successfully
+            }
+          }
+        }
         if (book) {
-          book.reviews.push({
+          bookReview = {
             username: username,
             review: review,
-            rating: rating,
-          });
+          }
+          book.reviews.push(bookReview);
           console.log(books[isbn]);
-          return res.status(201).json({ message: "Review added successfully" });
+          return res.status(201).json({ message: "Review added successfully", review: review});
         } else {
           return res.status(404).json({ message: "Book not found" });
         }
@@ -83,6 +92,37 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   }
   
 });
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  //Write your code here
+  const isbn = req.params.isbn;
+  const username = req.session.username;
+  try {
+    if (isbn && username) {
+      if (isValid(username)) {
+        const book = books[isbn];
+        if (book) {
+          for (const bookReview of book.reviews) {
+            if (bookReview.username === username) {
+              book.reviews = book.reviews.filter((review) => review.username !== username);
+              return res.status(200).json({ message: "Review deleted successfully" });
+            }
+          }
+          return res.status(404).json({ message: "Review not found" });
+        } else {
+          return res.status(404).json({ message: "Book not found" });
+        }
+      } else {
+        return res.status(401).json({ message: "User not registered" });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid request" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
