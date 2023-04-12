@@ -40,8 +40,8 @@ regd_users.post("/", (req, res) => {
         "access",
         { expiresIn: 60 * 60 }
       );
-      res.send(accessToken);
-      req.session.accessToken = accessToken;
+      res.status(201).send(accessToken);
+      // req.session.accessToken = accessToken;
     }
   } else {
     return res
@@ -68,7 +68,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
             rating: rating,
           });
           console.log(books[isbn]);
-          return res.status(200).json({ message: "Review added successfully" });
+          return res.status(201).json({ message: "Review added successfully" });
         } else {
           return res.status(404).json({ message: "Book not found" });
         }

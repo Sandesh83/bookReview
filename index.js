@@ -12,7 +12,7 @@ app.use(
   "/customer",
   session({
     secret: "fingerprint_customer",
-    resave: true,
+    resave: true,  
     saveUninitialized: true,
   })
 );
