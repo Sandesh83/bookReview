@@ -43,7 +43,6 @@ regd_users.post("/", (req, res) => {
       req.session.accessToken = accessToken;
       req.session.username = username;
       res.status(201).send(accessToken);
-      console.log(req.session.accessToken);
     }
   } else {
     return res
@@ -76,7 +75,6 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
             review: review,
           }
           book.reviews.push(bookReview);
-          console.log(books[isbn]);
           return res.status(201).json({ message: "Review added successfully", review: review});
         } else {
           return res.status(404).json({ message: "Book not found" });
